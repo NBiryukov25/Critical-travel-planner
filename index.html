@@ -367,9 +367,9 @@
       <div class="search-category">
         <div class="search-cat-label">&#127976; Hotels &amp; Accommodation</div>
         <div class="search-btn-row">
-          <button class="search-btn" data-action="hotel-booking"><Booking.com></button>
+          <button class="search-btn" data-action="hotel-booking">Booking.com</button>
           <button class="search-btn" data-action="hotel-expedia">Expedia Hotels</button>
-          <button class="search-btn" data-action="hotel-hotels"><Hotels.com></button>
+          <button class="search-btn" data-action="hotel-hotels">Hotels.com</button>
           <button class="search-btn" data-action="hotel-airbnb">Airbnb</button>
           <button class="search-btn" data-action="hotel-trivago">Trivago</button>
           <button class="search-btn search-btn-all" data-action="hotel-all">Open All &#8599;</button>
@@ -486,23 +486,23 @@
       const { origin, dest, dep, ret, pax, round } = getSearchParams();
       const hasRound = round && ret;
       switch (site) {
-        case 'google':    return `<https://www.google.com/travel/flights?q=Flights+from+${origin}+to+${dest}`>;
+        case 'google':    return `https://www.google.com/travel/flights?q=Flights+from+${origin}+to+${dest}`;
         case 'skyscanner':
           if (!dep) return null;
           return hasRound
-            ? `<https://www.skyscanner.com/transport/flights/${origin.toLowerCase()}/${dest.toLowerCase()}/${dep.skyScan}/${ret.skyScan}/?adults=${pax}`>
-            : `<https://www.skyscanner.com/transport/flights/${origin.toLowerCase()}/${dest.toLowerCase()}/${dep.skyScan}/?adults=${pax}`>;
+            ? `https://www.skyscanner.com/transport/flights/${origin.toLowerCase()}/${dest.toLowerCase()}/${dep.skyScan}/${ret.skyScan}/?adults=${pax}`
+            : `https://www.skyscanner.com/transport/flights/${origin.toLowerCase()}/${dest.toLowerCase()}/${dep.skyScan}/?adults=${pax}`;
         case 'kayak':
           if (!dep) return null;
           return hasRound
-            ? `<https://www.kayak.com/flights/${origin}-${dest}/${dep.y}-${dep.m}-${dep.d}/${ret.y}-${ret.m}-${ret.d}/${pax}adults`>
-            : `<https://www.kayak.com/flights/${origin}-${dest}/${dep.y}-${dep.m}-${dep.d}/${pax}adults`>;
+            ? `https://www.kayak.com/flights/${origin}-${dest}/${dep.y}-${dep.m}-${dep.d}/${ret.y}-${ret.m}-${ret.d}/${pax}adults`
+            : `https://www.kayak.com/flights/${origin}-${dest}/${dep.y}-${dep.m}-${dep.d}/${pax}adults`;
         case 'expedia':
           if (dep && hasRound)
-            return `<https://www.expedia.com/Flights-Search?trip=roundtrip&leg1=from:${origin},to:${dest},departure:${dep.m}%2F${dep.d}%2F${dep.y}TANYT&leg2=from:${dest},to:${origin},departure:${ret.m}%2F$>{ret.d}%2F${ret.y}TANYT&passengers=adults:${pax}`;
+            return `https://www.expedia.com/Flights-Search?trip=roundtrip&leg1=from:${origin},to:${dest},departure:${dep.m}%2F${dep.d}%2F${dep.y}TANYT&leg2=from:${dest},to:${origin},departure:${ret.m}%2F${ret.d}%2F${ret.y}TANYT&passengers=adults:${pax}`;
           if (dep)
-            return `<https://www.expedia.com/Flights-Search?trip=oneway&leg1=from:${origin},to:${dest},departure:${dep.m}%2F${dep.d}%2F${dep.y}TANYT&passengers=adults:${pax}`>;
-          return `<https://www.expedia.com/Flights-Search`>;
+            return `https://www.expedia.com/Flights-Search?trip=oneway&leg1=from:${origin},to:${dest},departure:${dep.m}%2F${dep.d}%2F${dep.y}TANYT&passengers=adults:${pax}`;
+          return `https://www.expedia.com/Flights-Search`;
         case 'momondo':
           if (!dep) return `https://www.momondo.com`;
           return hasRound
