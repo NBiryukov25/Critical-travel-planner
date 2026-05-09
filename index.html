@@ -1,1 +1,683 @@
-Wasted call — file unchanged since your last Read. Refer to that earlier tool_result instead.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6-Week Trip Budget Planner</title>
+  <style>
+    :root {
+      --bg:         #f4f6f9;
+      --surface:    #ffffff;
+      --surface-2:  #f0f4f8;
+      --border:     #d8e0ea;
+      --text:       #1a2535;
+      --text-soft:  #6b7f96;
+      --accent:     #2563eb;
+      --accent-lt:  #dbeafe;
+      --green:      #16a34a;
+      --green-lt:   #dcfce7;
+      --red:        #dc2626;
+      --red-lt:     #fee2e2;
+      --amber:      #d97706;
+      --amber-lt:   #fef3c7;
+      --radius:     10px;
+      --shadow:     0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 54px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .topbar-brand {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .topbar-brand .icon {
+      width: 28px; height: 28px;
+      background: var(--accent);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 15px;
+    }
+    .topbar-meta { display: flex; align-items: center; gap: 1rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.28em 0.75em;
+      border-radius: 2em;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: var(--accent-lt);
+      color: var(--accent);
+    }
+    .app-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.6rem 1.2rem 4rem;
+    }
+    .page-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+    .page-sub { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 1.6rem; }
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.4rem;
+    }
+    .s-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+    }
+    .s-card .sc-label {
+      font-size: 0.72rem; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--text-soft); margin-bottom: 0.35rem;
+    }
+    .s-card .sc-value { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+    .s-card.positive .sc-value { color: var(--green); }
+    .s-card.negative .sc-value { color: var(--red); }
+    .prog-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.2rem;
+      box-shadow: var(--shadow); margin-bottom: 1.4rem;
+    }
+    .prog-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.78rem; font-weight: 500; color: var(--text-soft); margin-bottom: 0.5rem;
+    }
+    .prog-bar {
+      height: 10px; background: var(--surface-2);
+      border-radius: 5px; overflow: hidden; border: 1px solid var(--border);
+    }
+    .prog-fill { height: 100%; border-radius: 5px; background: var(--accent); transition: width 0.35s ease; }
+    .prog-fill.warn { background: var(--amber); }
+    .prog-fill.over { background: var(--red); }
+    .callout-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem; margin-bottom: 1.6rem;
+    }
+    .callout {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.9rem 1.1rem; box-shadow: var(--shadow);
+    }
+    .callout .c-label {
+      font-size: 0.72rem; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--text-soft); margin-bottom: 0.25rem;
+    }
+    .callout .c-value { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
+    .callout.alert .c-value { color: var(--red); }
+    .callout.ok    .c-value { color: var(--green); }
+    .tip-box {
+      background: var(--amber-lt); border: 1px solid #fde68a;
+      border-radius: var(--radius); padding: 0.85rem 1.1rem;
+      font-size: 0.82rem; color: #78350f; line-height: 1.6; margin-bottom: 1.6rem;
+    }
+    .tip-box.ok { background: var(--green-lt); border-color: #86efac; color: #14532d; }
+    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 680px) { .main-grid { grid-template-columns: 1fr; } }
+    .full-col { grid-column: 1 / -1; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.2rem 1.3rem;
+    }
+    .card-title { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
+    .card-sub { font-size: 0.73rem; color: var(--text-soft); margin-bottom: 1rem; }
+    .f-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+    .f-row label { flex: 1; font-size: 0.8rem; color: var(--text); }
+    .f-row .f-unit { font-size: 0.72rem; color: var(--text-soft); white-space: nowrap; }
+    input[type="number"], input[type="text"], select {
+      padding: 0.38em 0.6em; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--surface-2); font-family: inherit; font-size: 0.82rem;
+      color: var(--text); width: 100px;
+    }
+    input[type="number"] { text-align: right; }
+    input[type="text"]   { text-align: left; }
+    input:focus, select:focus { outline: none; border-color: var(--accent); background: #fff; }
+    input[type="date"] {
+      padding: 0.38em 0.6em; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--surface-2); font-family: inherit; font-size: 0.82rem;
+      color: var(--text); width: 100%;
+    }
+    input[type="date"]:focus { outline: none; border-color: var(--accent); background: #fff; }
+    .f-total { width: 88px; text-align: right; font-size: 0.78rem; color: var(--text-soft); }
+    .card-footer {
+      display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem;
+      border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.6rem;
+      font-size: 0.75rem; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-soft);
+    }
+    .card-footer .footer-val {
+      font-size: 1.05rem; font-weight: 700; color: var(--text);
+      text-transform: none; letter-spacing: 0;
+    }
+    .settings-row { display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap; }
+    .settings-row .setting { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-soft); }
+    .settings-row select, .settings-row input[type="number"] { width: auto; }
+    .timeline-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.6rem; margin-top: 0.8rem;
+    }
+    @media (max-width: 700px) { .timeline-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 420px) { .timeline-grid { grid-template-columns: repeat(2, 1fr); } }
+    .wk {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.75rem 0.65rem; text-align: center;
+    }
+    .wk.trip { background: var(--accent-lt); border-color: #bfdbfe; }
+    .wk-label {
+      font-size: 0.62rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-soft); margin-bottom: 0.3rem;
+    }
+    .wk.trip .wk-label { color: var(--accent); }
+    .wk-amount { font-size: 0.92rem; font-weight: 700; color: var(--text); }
+    .wk-detail { font-size: 0.62rem; color: var(--text-soft); margin-top: 0.25rem; line-height: 1.45; }
+    .controls-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-top: 1.6rem; justify-content: center;
+    }
+    .btn {
+      padding: 0.5em 1.4em; border-radius: 6px; font-family: inherit;
+      font-size: 0.8rem; font-weight: 500; cursor: pointer;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text-soft);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .btn:hover { background: var(--surface-2); color: var(--text); }
+    .btn.danger:hover { border-color: var(--red); color: var(--red); }
+    .save-note { font-size: 0.73rem; color: var(--text-soft); opacity: 0; transition: opacity 0.3s; }
+    .save-note.show { opacity: 1; }
+    .search-panel { border: 2px solid var(--accent-lt); }
+    .search-fields {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.75rem; margin-bottom: 1.1rem;
+    }
+    .sf-group { display: flex; flex-direction: column; gap: 0.28rem; }
+    .sf-group label {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--text-soft);
+    }
+    .sf-group input, .sf-group select { width: 100%; }
+    .search-category { padding: 0.85rem 0; border-top: 1px solid var(--border); }
+    .search-cat-label { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.55rem; }
+    .search-btn-row { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+    .search-btn {
+      padding: 0.42em 1.05em; border-radius: 6px; font-family: inherit;
+      font-size: 0.78rem; font-weight: 500; cursor: pointer;
+      border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+      transition: all 0.15s;
+    }
+    .search-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .search-btn-all {
+      background: var(--accent-lt); border-color: #93c5fd;
+      color: var(--accent); font-weight: 600;
+    }
+    .search-btn-all:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .car-extra { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; flex-wrap: wrap; }
+    .car-extra label { font-size: 0.75rem; color: var(--text-soft); white-space: nowrap; }
+    .car-extra input[type="text"] { width: 200px; max-width: 100%; }
+    .search-hint {
+      font-size: 0.72rem; color: var(--text-soft);
+      margin-top: 0.85rem; padding-top: 0.75rem;
+      border-top: 1px solid var(--border); line-height: 1.5;
+    }
+    .search-hint strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="icon">&#9992;</div>
+      Trip Budget Planner
+    </div>
+    <div class="topbar-meta">
+      <div class="badge" id="countdown-badge">&#9203; 6 weeks to go</div>
+    </div>
+  </div>
+
+  <div class="app-wrap">
+    <div class="page-title">6-Week Trip Budget</div>
+    <p class="page-sub">Track travel costs, daily home expenses, and trip spending &mdash; all in one place.</p>
+
+    <div class="card full-col" style="margin-bottom:1rem;">
+      <div class="card-title">Setup</div>
+      <div class="card-sub">Your available funds and trip details</div>
+      <div class="settings-row">
+        <div class="setting">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="$">USD $</option>
+            <option value="&#8364;">EUR &#8364;</option>
+            <option value="&#163;">GBP &#163;</option>
+            <option value="&#165;">JPY &#165;</option>
+            <option value="&#8369;">PHP &#8369;</option>
+            <option value="A$">AUD A$</option>
+            <option value="C$">CAD C$</option>
+            <option value="&#8361;">KRW &#8361;</option>
+            <option value="CHF">CHF</option>
+            <option value="MXN$">MXN</option>
+          </select>
+        </div>
+        <div class="setting">
+          <label for="funds-available">Funds on hand</label>
+          <input type="number" id="funds-available" min="0" step="1" placeholder="0">
+        </div>
+        <div class="setting">
+          <label for="weekly-income">Income / savings per week</label>
+          <input type="number" id="weekly-income" min="0" step="1" placeholder="0">
+        </div>
+        <div class="setting">
+          <label for="trip-days">Trip length (days)</label>
+          <input type="number" id="trip-days" min="1" max="365" step="1" value="7">
+        </div>
+        <div class="setting">
+          <label for="weeks-out">Weeks until trip</label>
+          <input type="number" id="weeks-out" min="1" max="52" step="1" value="6">
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-strip">
+      <div class="s-card"><div class="sc-label">Total Available</div><div class="sc-value" id="sum-available">$0</div></div>
+      <div class="s-card"><div class="sc-label">Travel Costs</div><div class="sc-value" id="sum-travel">$0</div></div>
+      <div class="s-card"><div class="sc-label">Home Expenses</div><div class="sc-value" id="sum-home">$0</div></div>
+      <div class="s-card"><div class="sc-label">Trip Expenses</div><div class="sc-value" id="sum-trip">$0</div></div>
+      <div class="s-card"><div class="sc-label">Pre-Trip Costs</div><div class="sc-value" id="sum-pretip">$0</div></div>
+      <div class="s-card" id="balance-card"><div class="sc-label">Balance</div><div class="sc-value" id="sum-balance">$0</div></div>
+    </div>
+
+    <div class="prog-wrap">
+      <div class="prog-row"><span>Budget utilisation</span><span id="prog-pct">0% of available funds</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="callout-row">
+      <div class="callout" id="callout-save">
+        <div class="c-label">Need to save each week</div><div class="c-value" id="c-weekly-save">$0 / wk</div>
+      </div>
+      <div class="callout">
+        <div class="c-label">Daily budget on the trip</div><div class="c-value" id="c-daily">$0 / day</div>
+      </div>
+      <div class="callout">
+        <div class="c-label">Grand total needed</div><div class="c-value" id="c-grand">$0</div>
+      </div>
+    </div>
+
+    <div class="tip-box" id="tip-box">Fill in the sections below to see your personalised budget summary and savings plan.</div>
+
+    <div class="card full-col search-panel" style="margin-bottom:1rem;">
+      <div class="card-title">&#128269; Find the Best Deal</div>
+      <div class="card-sub">Enter your trip details, then open any search site pre-filled &mdash; prices found can be entered in the Travel Costs section below</div>
+      <div class="search-fields">
+        <div class="sf-group"><label>From (city or airport code)</label><input type="text" id="s-origin" placeholder="e.g. LAX"></div>
+        <div class="sf-group"><label>To (city or airport code)</label><input type="text" id="s-dest" placeholder="e.g. JFK"></div>
+        <div class="sf-group"><label>Departure date</label><input type="date" id="s-depart"></div>
+        <div class="sf-group"><label>Return date</label><input type="date" id="s-return"></div>
+        <div class="sf-group"><label>Adults</label><input type="number" id="s-pax" min="1" max="9" step="1" value="1"></div>
+        <div class="sf-group"><label>Trip type</label><select id="s-triptype"><option value="round">Round trip</option><option value="oneway">One way</option></select></div>
+      </div>
+      <div class="search-category">
+        <div class="search-cat-label">&#9992; Flights</div>
+        <div class="search-btn-row">
+          <button class="search-btn" data-action="flight-google">Google Flights</button>
+          <button class="search-btn" data-action="flight-skyscanner">Skyscanner</button>
+          <button class="search-btn" data-action="flight-kayak">Kayak</button>
+          <button class="search-btn" data-action="flight-expedia">Expedia</button>
+          <button class="search-btn" data-action="flight-momondo">Momondo</button>
+          <button class="search-btn search-btn-all" data-action="flight-all">Open All &#8599;</button>
+        </div>
+      </div>
+      <div class="search-category">
+        <div class="search-cat-label">&#128663; Car Rental</div>
+        <div class="car-extra">
+          <label>Pickup location (leave blank to use destination):</label>
+          <input type="text" id="s-car-loc" placeholder="e.g. JFK Airport or city">
+        </div>
+        <div class="search-btn-row">
+          <button class="search-btn" data-action="car-kayak">Kayak Cars</button>
+          <button class="search-btn" data-action="car-expedia">Expedia Cars</button>
+          <button class="search-btn" data-action="car-enterprise">Enterprise</button>
+          <button class="search-btn" data-action="car-hertz">Hertz</button>
+          <button class="search-btn" data-action="car-budget">Budget Rent-a-Car</button>
+          <button class="search-btn search-btn-all" data-action="car-all">Open All &#8599;</button>
+        </div>
+      </div>
+      <div class="search-category">
+        <div class="search-cat-label">&#127976; Hotels &amp; Accommodation</div>
+        <div class="search-btn-row">
+          <button class="search-btn" data-action="hotel-booking"><Booking.com></button>
+          <button class="search-btn" data-action="hotel-expedia">Expedia Hotels</button>
+          <button class="search-btn" data-action="hotel-hotels"><Hotels.com></button>
+          <button class="search-btn" data-action="hotel-airbnb">Airbnb</button>
+          <button class="search-btn" data-action="hotel-trivago">Trivago</button>
+          <button class="search-btn search-btn-all" data-action="hotel-all">Open All &#8599;</button>
+        </div>
+      </div>
+      <div class="search-hint">
+        <strong>Tip:</strong> Airport codes (LAX, JFK, LHR) give the best results on Skyscanner and Kayak.
+        City names work for hotels and Airbnb. All searches open in a new tab &mdash; come back and enter
+        the best prices you find in the <strong>Travel Costs</strong> and <strong>Daily Trip Expenses</strong> sections below.
+      </div>
+    </div>
+
+    <div class="main-grid">
+
+      <div class="card">
+        <div class="card-title">&#9992; Travel Costs</div>
+        <div class="card-sub">One-time costs to get there and back</div>
+        <div class="f-row"><label>Flights / transport to destination</label><input type="number" id="t-flights" min="0" step="1" placeholder="0"></div>
+        <div class="f-row" style="align-items:flex-start;flex-wrap:wrap;gap:0.4rem;">
+          <label style="flex-basis:100%;">Accommodation</label>
+          <input type="number" id="t-hotel-nights" min="0" step="1" placeholder="0" style="width:70px">
+          <span class="f-unit">nights &times;</span>
+          <input type="number" id="t-hotel-rate" min="0" step="1" placeholder="rate/nt" style="width:90px">
+          <span class="f-unit">= <span id="hotel-sub">$0</span></span>
+        </div>
+        <div class="f-row"><label>Airport / ground transport</label><input type="number" id="t-transport" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>Travel insurance</label><input type="number" id="t-insurance" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>Visa / passport / entry fees</label><input type="number" id="t-visa" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>Luggage / gear check-in fees</label><input type="number" id="t-luggage" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>Other travel costs</label><input type="number" id="t-other" min="0" step="1" placeholder="0"></div>
+        <div class="card-footer">Travel total &nbsp;<span class="footer-val" id="travel-total">$0</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">&#127968; Home Expenses</div>
+        <div class="card-sub">Weekly costs that continue while you're away</div>
+        <div class="f-row"><label>Rent / mortgage</label><input type="number" id="h-rent" min="0" step="1" placeholder="0/wk"><span class="f-total" id="ht-rent">$0</span></div>
+        <div class="f-row"><label>Utilities (power, water, gas)</label><input type="number" id="h-utilities" min="0" step="1" placeholder="0/wk"><span class="f-total" id="ht-utilities">$0</span></div>
+        <div class="f-row"><label>Groceries / household</label><input type="number" id="h-groceries" min="0" step="1" placeholder="0/wk"><span class="f-total" id="ht-groceries">$0</span></div>
+        <div class="f-row"><label>Subscriptions &amp; internet</label><input type="number" id="h-subs" min="0" step="1" placeholder="0/wk"><span class="f-total" id="ht-subs">$0</span></div>
+        <div class="f-row"><label>Pet care / house sitter</label><input type="number" id="h-pet" min="0" step="1" placeholder="0/wk"><span class="f-total" id="ht-pet">$0</span></div>
+        <div class="f-row"><label>Loan / insurance payments</label><input type="number" id="h-loan" min="0" step="1" placeholder="0/wk"><span class="f-total" id="ht-loan">$0</span></div>
+        <div class="f-row"><label>Other home expenses</label><input type="number" id="h-other" min="0" step="1" placeholder="0/wk"><span class="f-total" id="ht-other">$0</span></div>
+        <div class="card-footer"><span id="home-weeks-label">6-wk</span> home total &nbsp;<span class="footer-val" id="home-total">$0</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">&#128506; Daily Trip Expenses</div>
+        <div class="card-sub">Per-day spending while on the trip</div>
+        <div class="f-row"><label>Food &amp; drink</label><input type="number" id="d-food" min="0" step="1" placeholder="0/day"><span class="f-total" id="dt-food">$0</span></div>
+        <div class="f-row"><label>Local transport</label><input type="number" id="d-transport" min="0" step="1" placeholder="0/day"><span class="f-total" id="dt-transport">$0</span></div>
+        <div class="f-row"><label>Activities &amp; tours</label><input type="number" id="d-activities" min="0" step="1" placeholder="0/day"><span class="f-total" id="dt-activities">$0</span></div>
+        <div class="f-row"><label>Shopping &amp; souvenirs</label><input type="number" id="d-shopping" min="0" step="1" placeholder="0/day"><span class="f-total" id="dt-shopping">$0</span></div>
+        <div class="f-row"><label>Miscellaneous / emergency buffer</label><input type="number" id="d-misc" min="0" step="1" placeholder="0/day"><span class="f-total" id="dt-misc">$0</span></div>
+        <div class="card-footer">Trip total (<span id="trip-days-label">7</span> days) &nbsp;<span class="footer-val" id="trip-total">$0</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">&#129523; Pre-Trip Costs</div>
+        <div class="card-sub">One-off expenses before you leave</div>
+        <div class="f-row"><label>Clothing, gear &amp; packing supplies</label><input type="number" id="p-shopping" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>Health prep (vaccines, prescriptions)</label><input type="number" id="p-health" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>Document fees (copies, notary)</label><input type="number" id="p-docs" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>Currency exchange / card setup</label><input type="number" id="p-currency" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>SIM card / roaming plan</label><input type="number" id="p-comms" min="0" step="1" placeholder="0"></div>
+        <div class="f-row"><label>Other pre-trip costs</label><input type="number" id="p-other" min="0" step="1" placeholder="0"></div>
+        <div class="card-footer">Pre-trip total &nbsp;<span class="footer-val" id="pretip-total">$0</span></div>
+      </div>
+
+      <div class="card full-col">
+        <div class="card-title">&#128197; Week-by-Week Spending Plan</div>
+        <div class="card-sub">Estimated spend per week across the planning horizon</div>
+        <div class="timeline-grid" id="timeline"></div>
+      </div>
+
+    </div>
+
+    <div class="controls-row">
+      <button class="btn danger" id="btn-reset">Reset all</button>
+      <span class="save-note" id="save-note">&#10003; Saved</span>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'trip-budget-v2';
+    const INPUT_IDS = [
+      'currency','funds-available','weekly-income','trip-days','weeks-out',
+      't-flights','t-hotel-nights','t-hotel-rate','t-transport','t-insurance','t-visa','t-luggage','t-other',
+      'h-rent','h-utilities','h-groceries','h-subs','h-pet','h-loan','h-other',
+      'd-food','d-transport','d-activities','d-shopping','d-misc',
+      'p-shopping','p-health','p-docs','p-currency','p-comms','p-other',
+      's-origin','s-dest','s-depart','s-return','s-pax','s-triptype','s-car-loc'
+    ];
+
+    function sVal(id) { return (document.getElementById(id)?.value || '').trim(); }
+    function parseDateParts(str) {
+      if (!str) return null;
+      const [y, m, d] = str.split('-');
+      if (!y || !m || !d) return null;
+      return { y, m, d, skyScan: y.slice(-2) + m + d, iso: str };
+    }
+    function getSearchParams() {
+      return {
+        origin: encodeURIComponent(sVal('s-origin')),
+        dest:   encodeURIComponent(sVal('s-dest')),
+        dep:    parseDateParts(sVal('s-depart')),
+        ret:    parseDateParts(sVal('s-return')),
+        pax:    Math.max(1, parseInt(sVal('s-pax')) || 1),
+        round:  sVal('s-triptype') !== 'oneway',
+        carLoc: encodeURIComponent(sVal('s-car-loc') || sVal('s-dest'))
+      };
+    }
+    function buildFlightURL(site) {
+      const { origin, dest, dep, ret, pax, round } = getSearchParams();
+      const hasRound = round && ret;
+      switch (site) {
+        case 'google':    return `<https://www.google.com/travel/flights?q=Flights+from+${origin}+to+${dest}`>;
+        case 'skyscanner':
+          if (!dep) return null;
+          return hasRound
+            ? `<https://www.skyscanner.com/transport/flights/${origin.toLowerCase()}/${dest.toLowerCase()}/${dep.skyScan}/${ret.skyScan}/?adults=${pax}`>
+            : `<https://www.skyscanner.com/transport/flights/${origin.toLowerCase()}/${dest.toLowerCase()}/${dep.skyScan}/?adults=${pax}`>;
+        case 'kayak':
+          if (!dep) return null;
+          return hasRound
+            ? `<https://www.kayak.com/flights/${origin}-${dest}/${dep.y}-${dep.m}-${dep.d}/${ret.y}-${ret.m}-${ret.d}/${pax}adults`>
+            : `<https://www.kayak.com/flights/${origin}-${dest}/${dep.y}-${dep.m}-${dep.d}/${pax}adults`>;
+        case 'expedia':
+          if (dep && hasRound)
+            return `<https://www.expedia.com/Flights-Search?trip=roundtrip&leg1=from:${origin},to:${dest},departure:${dep.m}%2F${dep.d}%2F${dep.y}TANYT&leg2=from:${dest},to:${origin},departure:${ret.m}%2F$>{ret.d}%2F${ret.y}TANYT&passengers=adults:${pax}`;
+          if (dep)
+            return `<https://www.expedia.com/Flights-Search?trip=oneway&leg1=from:${origin},to:${dest},departure:${dep.m}%2F${dep.d}%2F${dep.y}TANYT&passengers=adults:${pax}`>;
+          return `<https://www.expedia.com/Flights-Search`>;
+        case 'momondo':
+          if (!dep) return `https://www.momondo.com`;
+          return hasRound
+            ? `https://www.momondo.com/flight-search/${origin}-${dest}/${dep.y}-${dep.m}-${dep.d}/${ret.y}-${ret.m}-${ret.d}?adults=${pax}`
+            : `https://www.momondo.com/flight-search/${origin}-${dest}/${dep.y}-${dep.m}-${dep.d}?adults=${pax}`;
+        default: return null;
+      }
+    }
+    function buildCarURL(site) {
+      const { dep, ret, carLoc } = getSearchParams();
+      switch (site) {
+        case 'kayak':      return (dep && ret) ? `https://www.kayak.com/cars/${carLoc}/${dep.y}-${dep.m}-${dep.d}/${ret.y}-${ret.m}-${ret.d}` : `https://www.kayak.com/cars`;
+        case 'expedia':    return (dep && ret) ? `https://www.expedia.com/Cars/search?locn=${carLoc}&date1=${dep.y}-${dep.m}-${dep.d}&date2=${ret.y}-${ret.m}-${ret.d}` : `https://www.expedia.com/Cars`;
+        case 'enterprise': return `https://www.enterprise.com/en/car-rental.html`;
+        case 'hertz':      return `https://www.hertz.com/rentacar/reservation/`;
+        case 'budget':     return `https://www.budget.com/en/home`;
+        default: return null;
+      }
+    }
+    function buildHotelURL(site) {
+      const { dest, dep, ret, pax } = getSearchParams();
+      const rawDest = decodeURIComponent(dest);
+      switch (site) {
+        case 'booking':
+          return (dep && ret)
+            ? `https://www.booking.com/searchresults.html?ss=${dest}&checkin_year=${dep.y}&checkin_month=${parseInt(dep.m)}&checkin_monthday=${parseInt(dep.d)}&checkout_year=${ret.y}&checkout_month=${parseInt(ret.m)}&checkout_monthday=${parseInt(ret.d)}&group_adults=${pax}&no_rooms=1&order=price`
+            : `https://www.booking.com/searchresults.html?ss=${dest}`;
+        case 'expedia':
+          return (dep && ret)
+            ? `https://www.expedia.com/Hotel-Search?destination=${dest}&startDate=${dep.m}%2F${dep.d}%2F${dep.y}&endDate=${ret.m}%2F${ret.d}%2F${ret.y}&adults=${pax}`
+            : `https://www.expedia.com/Hotel-Search?destination=${dest}`;
+        case 'hotels':
+          return (dep && ret)
+            ? `https://www.hotels.com/search.do?q-destination=${dest}&q-check-in=${dep.iso}&q-check-out=${ret.iso}&q-rooms=1&q-room-0-adults=${pax}`
+            : `https://www.hotels.com/search.do?q-destination=${dest}`;
+        case 'airbnb':
+          return (dep && ret)
+            ? `https://www.airbnb.com/s/${rawDest}/homes?checkin=${dep.iso}&checkout=${ret.iso}&adults=${pax}`
+            : `https://www.airbnb.com/s/${rawDest}/homes`;
+        case 'trivago':
+          return `https://www.trivago.com/?aDateRange[arr]=${dep ? dep.iso : ''}&aDateRange[dep]=${ret ? ret.iso : ''}&iRoomType=7&aRooms[0][adults]=${pax}&aPois[0][searchId]=${dest}&aPois[0][type]=city`;
+        default: return null;
+      }
+    }
+    function openSearch(url) { if (url) window.open(url, '_blank', 'noopener'); }
+    function handleSearchClick(action) {
+      if      (action === 'flight-all') ['google','skyscanner','kayak','expedia','momondo'].forEach(s => openSearch(buildFlightURL(s)));
+      else if (action.startsWith('flight-')) openSearch(buildFlightURL(action.replace('flight-','')));
+      else if (action === 'car-all')    ['kayak','expedia','enterprise','hertz','budget'].forEach(s => openSearch(buildCarURL(s)));
+      else if (action.startsWith('car-'))    openSearch(buildCarURL(action.replace('car-','')));
+      else if (action === 'hotel-all')  ['booking','expedia','hotels','airbnb','trivago'].forEach(s => openSearch(buildHotelURL(s)));
+      else if (action.startsWith('hotel-'))  openSearch(buildHotelURL(action.replace('hotel-','')));
+    }
+
+    function save() {
+      const d = {};
+      INPUT_IDS.forEach(id => { const el = document.getElementById(id); if (el) d[id] = el.value; });
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch(e) {}
+      const note = document.getElementById('save-note');
+      note.classList.add('show');
+      clearTimeout(note._t);
+      note._t = setTimeout(() => note.classList.remove('show'), 1600);
+    }
+    function load() {
+      try {
+        const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        INPUT_IDS.forEach(id => { const el = document.getElementById(id); if (el && d[id] !== undefined) el.value = d[id]; });
+      } catch(e) {}
+    }
+
+    function v(id) { return parseFloat(document.getElementById(id)?.value) || 0; }
+    function sym() { return document.getElementById('currency')?.value || '$'; }
+    function fmt(n) {
+      const s = sym(), neg = n < 0, abs = Math.abs(n);
+      return (neg ? '\u2212' : '') + s + (abs >= 1000 ? Math.round(abs).toLocaleString() : abs.toFixed(0));
+    }
+    function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+    function recalc() {
+      const weeks = Math.max(1, v('weeks-out'));
+      const days  = Math.max(1, v('trip-days'));
+      const hotelSub    = v('t-hotel-nights') * v('t-hotel-rate');
+      const travelTotal = v('t-flights') + hotelSub + v('t-transport') + v('t-insurance') + v('t-visa') + v('t-luggage') + v('t-other');
+      setText('hotel-sub', fmt(hotelSub));
+      setText('travel-total', fmt(travelTotal));
+      const homeFields  = ['h-rent','h-utilities','h-groceries','h-subs','h-pet','h-loan','h-other'];
+      const homeWeekly  = homeFields.reduce((s, id) => s + v(id), 0);
+      const homeTotal   = homeWeekly * weeks;
+      homeFields.forEach(id => setText(id.replace('h-','ht-'), fmt(v(id) * weeks)));
+      setText('home-weeks-label', weeks + '-wk');
+      setText('home-total', fmt(homeTotal));
+      const tripFields  = ['d-food','d-transport','d-activities','d-shopping','d-misc'];
+      const dailyTotal  = tripFields.reduce((s, id) => s + v(id), 0);
+      const tripTotal   = dailyTotal * days;
+      tripFields.forEach(id => setText(id.replace('d-','dt-'), fmt(v(id) * days)));
+      setText('trip-days-label', days);
+      setText('trip-total', fmt(tripTotal));
+      const preTotal    = v('p-shopping') + v('p-health') + v('p-docs') + v('p-currency') + v('p-comms') + v('p-other');
+      setText('pretip-total', fmt(preTotal));
+      const grandTotal  = travelTotal + homeTotal + tripTotal + preTotal;
+      const totalIn     = v('funds-available') + v('weekly-income') * weeks;
+      const balance     = totalIn - grandTotal;
+      const weeklySave  = weeks > 0 ? Math.max(0, grandTotal - v('funds-available')) / weeks : 0;
+      setText('sum-available', fmt(totalIn));
+      setText('sum-travel',    fmt(travelTotal));
+      setText('sum-home',      fmt(homeTotal));
+      setText('sum-trip',      fmt(tripTotal));
+      setText('sum-pretip',    fmt(preTotal));
+      setText('sum-balance',   fmt(balance));
+      document.getElementById('balance-card').className = 's-card ' + (balance > 0 ? 'positive' : balance < 0 ? 'negative' : '');
+      const pct = totalIn > 0 ? (grandTotal / totalIn) * 100 : 0;
+      const fill = document.getElementById('prog-fill');
+      fill.style.width = Math.min(100, pct) + '%';
+      fill.className = 'prog-fill' + (pct > 100 ? ' over' : pct > 80 ? ' warn' : '');
+      setText('prog-pct', pct.toFixed(0) + '% of available funds');
+      setText('c-weekly-save', fmt(weeklySave) + ' / wk');
+      document.getElementById('callout-save').className = 'callout' + (weeklySave === 0 ? ' ok' : ' alert');
+      setText('c-daily', fmt(dailyTotal) + ' / day');
+      setText('c-grand', fmt(grandTotal));
+      const box = document.getElementById('tip-box');
+      if (grandTotal === 0) {
+        box.className = 'tip-box';
+        box.textContent = 'Fill in the sections below to see your personalised budget summary and savings plan.';
+      } else if (balance >= 0) {
+        box.className = 'tip-box ok';
+        box.textContent = `You're on track! With ${fmt(totalIn)} available and ${fmt(grandTotal)} needed, you have a ${fmt(balance)} cushion (${(100-pct).toFixed(0)}% headroom). Keep an emergency buffer of at least 10% (${fmt(grandTotal*0.1)}) for the unexpected.`;
+      } else {
+        box.className = 'tip-box';
+        box.textContent = `You're ${fmt(Math.abs(balance))} short. You need to save ${fmt(weeklySave)}/week over the planning period. Consider cutting home expenses, finding better flight deals, or reducing the daily trip budget to close the gap.`;
+      }
+      setText('countdown-badge', '\u23f3 ' + weeks + (weeks === 1 ? ' week' : ' weeks') + ' to go');
+      const container = document.getElementById('timeline');
+      container.innerHTML = '';
+      const preW1 = Math.ceil(preTotal * 0.6), preW2 = preTotal - preW1;
+      for (let w = 1; w <= weeks; w++) {
+        const isTrip = w === weeks;
+        let cost = homeWeekly;
+        const details = [];
+        if (homeWeekly > 0) details.push('Home: ' + fmt(homeWeekly));
+        if (w === 1 && preW1 > 0) { cost += preW1; details.push('Pre-trip: ' + fmt(preW1)); }
+        if (w === 2 && preW2 > 0) { cost += preW2; details.push('Pre-trip: ' + fmt(preW2)); }
+        if (isTrip) {
+          cost += travelTotal + tripTotal;
+          if (travelTotal > 0) details.push('Travel: ' + fmt(travelTotal));
+          if (tripTotal > 0)   details.push('Trip (' + days + 'd): ' + fmt(tripTotal));
+        }
+        const div = document.createElement('div');
+        div.className = 'wk' + (isTrip ? ' trip' : '');
+        div.innerHTML = `<div class="wk-label">${isTrip ? '&#9992; Trip Week' : 'Week ' + w}</div><div class="wk-amount">${fmt(cost)}</div><div class="wk-detail">${details.join('<br>')}</div>`;
+        container.appendChild(div);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      load();
+      recalc();
+      document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input',  () => { recalc(); save(); });
+        el.addEventListener('change', () => { recalc(); save(); });
+      });
+      document.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => handleSearchClick(btn.dataset.action));
+      });
+      document.getElementById('btn-reset').addEventListener('click', () => {
+        if (!confirm('Reset all figures? This will clear everything.')) return;
+        localStorage.removeItem(STORAGE_KEY);
+        document.querySelectorAll('input[type="number"], input[type="text"], input[type="date"]').forEach(el => el.value = '');
+        document.getElementById('trip-days').value  = 7;
+        document.getElementById('weeks-out').value  = 6;
+        document.getElementById('s-pax').value      = 1;
+        document.getElementById('currency').value   = '$';
+        document.getElementById('s-triptype').value = 'round';
+        recalc();
+      });
+    });
+  </script>
+</body>
+</html>
